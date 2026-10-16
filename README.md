@@ -1,3 +1,35 @@
+> **这是一个二次开发分支 / This is a fork with an added feature.**
+>
+> 本项目基于 **[alejandrobujan/tendedero](https://github.com/alejandrobujan/tendedero)** 修改，**全部核心设计与代码版权归原作者 Alejandro Buján 所有**。在此向原作者致敬——Tendedero 的晾衣绳创意与精巧实现都出自他手。
+>
+> This repository is a fork of **[alejandrobujan/tendedero](https://github.com/alejandrobujan/tendedero)**. All core design and code belong to the original author, **Alejandro Buján** — full credit to him for the lovely clothesline idea and its meticulous execution.
+>
+> ### 本分支的补充 / What this fork adds
+>
+> **在原作者基础上，补充了「剪贴板文字复制记录」功能。**
+>
+> 原版 Tendedero 只能把复制的*图片*挂上晾衣绳；本分支让**复制的文字**也能作为便签卡挂上绳：
+>
+> - 复制一段文字（Cmd+C）→ 自动挂成一张淡黄色便签卡
+> - **点击便签卡** → 复制纯文本，到任何输入框 Cmd+V 粘贴
+> - 多次复制同一段文字只挂一张，点击卡片复制不会重复挂
+> - 兼容各类来源（含 MOSS、备忘录、浏览器等富文本应用的 Cmd+C）
+> - 菜单栏开关升级为「挂上复制的图片和文字」
+>
+> **Building on the original, this fork adds clipboard *text* capture.**
+>
+> The original Tendedero hangs only copied *images*; this fork also hangs copied **text** as note cards:
+>
+> - Copy some text (Cmd+C) → it hangs as a small yellow note card
+> - **Click a note card** → copies plain text, ready to paste (Cmd+V) anywhere
+> - Re-copying the same text hangs only once; click-copying a card never re-hangs it
+> - Works with rich-text sources (MOSS, Notes, browsers, etc.)
+> - The menu bar toggle is now “Hang copied images and text”
+>
+> ---
+>
+> <br>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/hero-dark.png">
   <img src="docs/images/hero-light.png" alt="Tendedero. Screenshots, hung out to dry. Three screenshots in glass frames hang from a thin line under the macOS menu bar.">

@@ -28,6 +28,7 @@ struct GrabArea: NSViewRepresentable {
         let id = item.id
         let line = line
         let isRecording = item.isRecording
+        let isText = item.isText
         view.url = item.url
         view.dragImage = item.thumb
         view.onClick = { line.copy(id) }
@@ -40,7 +41,9 @@ struct GrabArea: NSViewRepresentable {
         }
         view.onTrash = { line.trash(id) }
         view.onDiscard = { line.discard(id) }
-        view.onLongPress = { line.markup(id) }
+        // Markup edits pictures and the trimmer edits recordings; a note has
+        // no editor here, so a long press does nothing.
+        if !isText { view.onLongPress = { line.markup(id) } }
         view.onForceClick = { line.quickLook(id) }
         view.onPressChange = { pressed in line.pressedID = pressed ? id : nil }
         view.menuProvider = {
@@ -50,7 +53,7 @@ struct GrabArea: NSViewRepresentable {
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })
-            if !isRecording {
+            if !isRecording && !isText {
                 menu.addItem(ClosureMenuItem(L("Markup")) { line.markup(id) })
             }
             menu.addItem(ClosureMenuItem(L("Show in Finder")) { line.reveal(id) })
@@ -164,6 +167,9 @@ final class GrabView: NSView, NSDraggingSource {
         startedDrag = true
         endPress()
 
+        // A note drags as its file, like a photo: a folder keeps the .txt,
+        // a chat box sends it as an attachment. (Chat inputs don't accept a
+        // text drop, so copying the text out is the click, not the drag.)
         let item = NSDraggingItem(pasteboardWriter: url as NSURL)
         item.setDraggingFrame(imageFrame(), contents: dragImage)
         let session = beginDraggingSession(with: [item], event: event, source: self)

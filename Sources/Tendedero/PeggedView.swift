@@ -66,6 +66,18 @@ struct PeggedView: View {
                     .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5)
             )
             .overlay {
+                // A note says so with a small text badge, like the recording's
+                // play button.
+                if item.isText {
+                    Image(systemName: "text.quote")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 28, height: 28)
+                        .glassFrame(circle: true)
+                        .allowsHitTesting(false)
+                }
+            }
+            .overlay {
                 // A recording says so with a play button over its first frame.
                 if item.isRecording {
                     Image(systemName: "play.fill")

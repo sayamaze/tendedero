@@ -40,7 +40,7 @@
 "When the pointer rests in the menu bar" = "ポインタがメニューバーにとどまったとき";
 "When something new hangs" = "新しいものが吊るされたとき";
 "Over full screen apps" = "フルスクリーンのアプリの上にも";
-"Hang copied images" = "コピーした画像を吊るす";
+"Hang copied images and text" = "Hang copied images and text";
 "Images you copy hang on the line too" = "コピーした画像もロープに吊るされます";
 "Tendedero, hanging copied images" = "Tendedero、コピーした画像を吊るしています";
 
