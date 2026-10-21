@@ -6,25 +6,33 @@
 >
 > ### 本分支的补充 / What this fork adds
 >
-> **在原作者基础上，补充了「剪贴板文字复制记录」功能。**
+> **在原作者基础上，补充了「剪贴板文字复制记录」及一系列效率增强。**
 >
-> 原版 Tendedero 只能把复制的*图片*挂上晾衣绳；本分支让**复制的文字**也能作为便签卡挂上绳：
+> **① 文字便签卡 / Text note cards** —— 原版只能挂复制的*图片*，本分支让复制的**文字**也能挂成淡黄色便签卡：
 >
-> - 复制一段文字（Cmd+C）→ 自动挂成一张淡黄色便签卡
-> - **点击便签卡** → 复制纯文本，到任何输入框 Cmd+V 粘贴
-> - 多次复制同一段文字只挂一张，点击卡片复制不会重复挂
-> - 兼容各类来源（含 MOSS、备忘录、浏览器等富文本应用的 Cmd+C）
+> - 复制一段文字（Cmd+C）→ 自动挂成便签卡；点击 → 复制纯文本，Cmd+V 粘贴到任意输入框
+> - 多次复制同一段只挂一张；点卡片复制不会重复挂；兼容 MOSS、备忘录、浏览器等富文本来源
 > - 菜单栏开关升级为「挂上复制的图片和文字」
 >
-> **Building on the original, this fork adds clipboard *text* capture.**
+> **② 添加至日程待办 / Add to Todo** —— 文本卡右键「添加至日程待办」，把原文发送给本地日程待办 App，由其 AI 提炼主题/拆解/标签/日期后自动建成结构化待办（Tendedero 只传原文，分析由待办 App 负责）。
 >
-> The original Tendedero hangs only copied *images*; this fork also hangs copied **text** as note cards:
+> **③ 固定 / Pin** —— 右键「固定」（菜单第一位，勾选态互斥）。固定的卡片不会被新内容顶掉，也不会被「全部取下 / 取下左侧 / 取下右侧」移除；只能取消固定后取下，或右键丢弃。固定状态持久化，卡片右上角显示图钉。
 >
-> - Copy some text (Cmd+C) → it hangs as a small yellow note card
-> - **Click a note card** → copies plain text, ready to paste (Cmd+V) anywhere
-> - Re-copying the same text hangs only once; click-copying a card never re-hangs it
-> - Works with rich-text sources (MOSS, Notes, browsers, etc.)
-> - The menu bar toggle is now “Hang copied images and text”
+> **④ 体验细节 / Refinements**
+>
+> - 少量文字（<200 字）复制时**静默挂绳**，晾衣绳不滑下打扰；大批量文字才滑下确认
+> - 菜单栏触发放下的热区收窄到**中间 50%**（左右各 35%），避免点到 App 菜单或控制中心时误触
+> - 文本卡字体放大至 13 号，更易读
+>
+> **Building on the original, this fork adds clipboard *text* capture plus a set of productivity enhancements.**
+>
+> **① Text note cards** —— the original hangs only copied *images*; this fork also hangs copied **text** as yellow note cards (click to copy, dedup, rich-text sources supported).
+>
+> **② Add to Todo** —— a note's menu can send its text to a local todo app, whose own AI files it as a structured task (Tendedero only ships the raw text).
+>
+> **③ Pin** —— pin a card so new captures and mass take-downs never remove it; it leaves only by an explicit discard or by unpinning first. Pins persist and show a corner badge.
+>
+> **④ Refinements** —— small copies hang silently without dropping the line; the menu-bar hot zone narrows to the middle stretch; note text is larger.
 >
 > ---
 >
