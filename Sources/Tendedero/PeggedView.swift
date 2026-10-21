@@ -96,6 +96,19 @@ struct PeggedView: View {
             .scaleEffect(pressed ? 0.95 : (hovering ? 1.035 : 1), anchor: .top)
             .animation(pressed ? .easeInOut(duration: 0.45) : .spring(response: 0.3, dampingFraction: 0.6), value: pressed)
             .opacity(dragging ? 0.45 : 1)
+            .overlay(alignment: .topTrailing) {
+                // A pinned photo shows its pin in the corner, always, so you
+                // can tell at a glance it will not be pushed off.
+                if item.pinned {
+                    Image(systemName: "pin.fill")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 20, height: 20)
+                        .glassFrame(circle: true)
+                        .padding(3)
+                        .allowsHitTesting(false)
+                }
+            }
             .overlay(alignment: .topLeading) {
                 // Drawn here, clicked through GrabView, which sits on top. A
                 // cross sends a file in Tendedero's folder to the Trash; for a

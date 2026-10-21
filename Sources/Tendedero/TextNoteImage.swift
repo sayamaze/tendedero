@@ -13,7 +13,7 @@ enum TextNoteImage {
         NSColor(calibratedRed: 1.0, green: 0.965, blue: 0.82, alpha: 1).setFill()
         NSRect(origin: .zero, size: size).fill()
 
-        let font = NSFont.systemFont(ofSize: 11 * scale)
+        let font = NSFont.systemFont(ofSize: 13 * scale)
         let shown = text.count > 600 ? String(text.prefix(600)) + "…" : text
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineBreakMode = .byWordWrapping

@@ -50,9 +50,17 @@ struct GrabArea: NSViewRepresentable {
             let menu = NSMenu()
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
+            // Pinning leads the menu, one exclusive item checked while pinned:
+            // a pinned photo keeps its place as new captures and mass
+            // take-downs pass it by, until it is unpinned or discarded. Read
+            // the pin state live so the checkmark is right after each toggle.
+            let pinned = line.items.first(where: { $0.id == id })?.pinned ?? false
+            let pinItem = ClosureMenuItem(L("Pin")) { line.togglePin(id) }
+            pinItem.state = pinned ? .on : .off
+            menu.addItem(pinItem)
+            menu.addItem(.separator())
             // Only a note can be filed as a todo: its text is what the todo
             // app analyses. A screenshot or recording has no text to offer.
-            // It leads the menu, in a group of its own.
             if isText {
                 menu.addItem(ClosureMenuItem(L("Add to Todo")) { line.addToTodo(id) })
                 menu.addItem(.separator())

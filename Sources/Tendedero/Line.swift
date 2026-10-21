@@ -15,13 +15,18 @@ struct Pegged: Identifiable, Equatable {
     var falling = false
     /// Still flying in from where it was captured; the card waits hidden.
     var flying = false
+    /// Pinned to the line: never pushed off by new captures, and left alone
+    /// by "take everything down" and its side variants. Only an explicit
+    /// discard (the cross, or unpin then take down) removes it.
+    var pinned = false
     /// A screen recording rather than a screenshot.
     var isRecording: Bool { Tendedero.isRecording(url) }
     /// Copied text hanging as a note rather than a picture.
     var isText: Bool { Tendedero.isTextNote(url) }
 
     static func == (a: Pegged, b: Pegged) -> Bool {
-        a.id == b.id && a.falling == b.falling && a.flying == b.flying && a.thumb === b.thumb
+        a.id == b.id && a.falling == b.falling && a.flying == b.flying
+            && a.pinned == b.pinned && a.thumb === b.thumb
     }
 }
 
@@ -69,6 +74,7 @@ final class Line: ObservableObject {
     var liveCount: Int { items.filter { !$0.falling }.count }
 
     private let storeKey = "pegged"
+    private let pinnedKey = "pinned"
 
     init() {
         restore()
@@ -88,7 +94,10 @@ final class Line: ObservableObject {
         // A full line lets the oldest photo fall off the far end. Only one: a
         // line hung on a wider screen keeps its length here instead of losing
         // several photos to a single capture.
-        if liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+        // A full line lets the oldest photo fall off the far end. Only one: a
+        // line hung on a wider screen keeps its length here instead of losing
+        // several photos to a single capture. Pinned photos never fall.
+        if liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.pinned }) {
             letGo(oldest.id)
         }
         save()
@@ -118,9 +127,10 @@ final class Line: ObservableObject {
         }
     }
 
-    /// "Take everything down": every photo goes the way of its corner cross.
+    /// "Take everything down": every unpinned photo goes the way of its
+    /// corner cross. Pinned ones stay, as pinning promised.
     func clear() {
-        takeDown(items.filter { !$0.falling })
+        takeDown(items.filter { !$0.falling && !$0.pinned })
     }
 
     /// The photos hung before (left) or after (right) this one.
@@ -132,9 +142,9 @@ final class Line: ObservableObject {
 
     /// Takes down everything on one side of a photo. Each one goes the way
     /// of its own corner button: to the Trash from Tendedero's folder, and
-    /// only off the line from anywhere else.
+    /// only off the line from anywhere else. Pinned photos are left hanging.
     func takeDown(_ id: UUID, toTheLeft: Bool) {
-        takeDown(neighbours(of: id, toTheLeft: toTheLeft))
+        takeDown(neighbours(of: id, toTheLeft: toTheLeft).filter { !$0.pinned })
     }
 
     /// One after another, and only the first makes a sound.
@@ -220,6 +230,15 @@ final class Line: ObservableObject {
         if isInInbox(id) { trash(id, quietly: quietly) } else { drop(id, quietly: quietly) }
     }
 
+    /// Pins a photo so new captures and mass take-downs leave it alone, and
+    /// unpins it so it behaves like any other again. Discarding still works
+    /// either way: that is always the explicit way to let one go.
+    func togglePin(_ id: UUID) {
+        guard let i = items.firstIndex(where: { $0.id == id }) else { return }
+        items[i].pinned.toggle()
+        save()
+    }
+
     /// The oldest photo falling off a full line. Like the cross, a file from
     /// Tendedero's folder goes to the Trash, or nothing would ever take it out
     /// of that folder. If the Trash refuses it, it still leaves the line.
@@ -231,9 +250,9 @@ final class Line: ObservableObject {
     }
 
     /// After Keep on line is lowered, the oldest photos past it go the way
-    /// of a full line.
+    /// of a full line. Pinned photos are never among them.
     func trim() {
-        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling }) {
+        while liveCount > maxItems, let oldest = items.first(where: { !$0.falling && !$0.pinned }) {
             letGo(oldest.id)
         }
         scroll = 0
@@ -347,19 +366,24 @@ final class Line: ObservableObject {
     // MARK: Persistence
 
     private func save() {
-        let paths = items.filter { !$0.falling }.map(\.url.path)
-        UserDefaults.standard.set(paths, forKey: storeKey)
+        let live = items.filter { !$0.falling }
+        UserDefaults.standard.set(live.map(\.url.path), forKey: storeKey)
+        UserDefaults.standard.set(live.filter(\.pinned).map(\.url.path), forKey: pinnedKey)
     }
 
-    /// Everything comes back as it was. This runs before the line knows its
-    /// screen, so the capacity is still the default one: hanging through
-    /// `hang` would let photos fall off a wide screen's line at every launch.
+    /// Everything comes back as it was, pins included. This runs before the
+    /// line knows its screen, so the capacity is still the default one:
+    /// hanging through `hang` would let photos fall off a wide screen's line
+    /// at every launch.
     private func restore() {
         let paths = UserDefaults.standard.stringArray(forKey: storeKey) ?? []
+        let pinned = Set(UserDefaults.standard.stringArray(forKey: pinnedKey) ?? [])
         for path in paths where FileManager.default.fileExists(atPath: path) {
             let url = URL(fileURLWithPath: path)
             guard !items.contains(where: { $0.url == url }), let thumb = makeThumbnail(url) else { continue }
-            items.append(Pegged(url: url, thumb: thumb))
+            var item = Pegged(url: url, thumb: thumb)
+            item.pinned = pinned.contains(path)
+            items.append(item)
         }
     }
 

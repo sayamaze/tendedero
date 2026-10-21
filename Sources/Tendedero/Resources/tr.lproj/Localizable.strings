@@ -52,6 +52,8 @@
 "Show in Finder" = "Finder'da göster";
 "Save to Desktop" = "Masaüstüne kaydet";
 "Add to Todo" = "Add to Todo";
+"Pin" = "Pin";
+"Unpin" = "Unpin";
 "Discard" = "Sil";
 "Take down" = "İndir";
 "Move to Trash" = "Çöp Kutusu'na taşı";

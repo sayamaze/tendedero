@@ -52,6 +52,8 @@
 "Show in Finder" = "Afficher dans le Finder";
 "Save to Desktop" = "Enregistrer sur le bureau";
 "Add to Todo" = "Add to Todo";
+"Pin" = "Pin";
+"Unpin" = "Unpin";
 "Discard" = "Jeter";
 "Take down" = "Décrocher";
 "Move to Trash" = "Placer dans la corbeille";
