@@ -50,6 +50,13 @@ struct GrabArea: NSViewRepresentable {
             let menu = NSMenu()
             // Items say themselves whether they can be used.
             menu.autoenablesItems = false
+            // Only a note can be filed as a todo: its text is what the todo
+            // app analyses. A screenshot or recording has no text to offer.
+            // It leads the menu, in a group of its own.
+            if isText {
+                menu.addItem(ClosureMenuItem(L("Add to Todo")) { line.addToTodo(id) })
+                menu.addItem(.separator())
+            }
             menu.addItem(ClosureMenuItem(L("Copy")) { line.copy(id) })
             menu.addItem(ClosureMenuItem(L("Open")) { line.open(id) })
             menu.addItem(ClosureMenuItem(L("Quick Look")) { line.quickLook(id) })

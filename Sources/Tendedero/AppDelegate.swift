@@ -277,16 +277,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// A new screenshot lifts off from where it was taken and flies to its
     /// place on the line. Without a known capture area it simply drops in.
+    /// Below this many characters, a copied text hangs quietly: the line
+    /// stays tucked away instead of sliding down, so small copies (a word, a
+    /// name, an ID) do not interrupt. A substantial copy brings the line down
+    /// as usual, confirming the capture.
+    private static let quietTextMaxCharacters = 200
+
     private func hangCapture(_ url: URL) {
         let from = captureRect(of: url)
         let screen = from.flatMap { from in
             NSScreen.screens.first { NSMouseInRect(CGPoint(x: from.midX, y: from.midY), $0.frame, false) }
         }
-        // Every capture brings the line down before it hangs, on the screen it
-        // was taken on. On a full line the oldest photo then falls in view as
-        // the new one flies in.
-        comeDown(on: screen)
-        guard let id = line.hang(url, flying: from != nil) else {
+        // A short text note hangs silently; everything else brings the line
+        // down on the screen it was taken on. On a full line the oldest photo
+        // then falls in view as the new one flies in.
+        let quiet = isTextNote(url)
+            && ((try? String(contentsOf: url, encoding: .utf8))?.count ?? 0) < Self.quietTextMaxCharacters
+        if !quiet { comeDown(on: screen) }
+        guard let id = line.hang(url, flying: from != nil && !quiet) else {
             // Nothing hung after all, so an empty line goes away again.
             itemsChanged()
             return
@@ -452,6 +460,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return NSRect(x: screen.frame.minX, y: screen.frame.maxY - h, width: screen.frame.width, height: h)
     }
 
+    /// Only the middle stretch of the menu bar opens the line. The left end
+    /// holds the app's own menus and the right end the status icons and
+    /// Control Center, both busy with their own clicks; resting there should
+    /// not drop the line. The middle half is kept, clear of both.
+    static func menuBarHotZone(of screen: NSScreen) -> NSRect {
+        let band = menuBarBand(of: screen)
+        let inset = band.width * 0.35
+        return band.insetBy(dx: inset, dy: 0)
+    }
+
     /// A click anywhere in the top bar of any screen, a menu or an icon, puts the line away.
     private func watchMenuBarClicks() {
         let handler: (NSEvent?) -> Void = { [weak self] _ in
@@ -482,7 +500,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let now = Date()
 
         let screenUnderPointer = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
-        let inMenuBar = screenUnderPointer.map { NSMouseInRect(mouse, Self.menuBarBand(of: $0), false) } ?? false
+        // Only the menu bar's middle opens the line; the ends belong to the
+        // app's menus and the status icons, and resting there stays out of it.
+        let inMenuBar = screenUnderPointer.map { NSMouseInRect(mouse, Self.menuBarHotZone(of: $0), false) } ?? false
         if !inMenuBar { menuBarSuppressed = false }
 
         guard isRevealed else {

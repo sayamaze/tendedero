@@ -270,6 +270,31 @@ final class Line: ObservableObject {
         return candidate
     }
 
+    // MARK: Send a note to the todo app
+
+    /// "Add to todo": hand a note's text to the todo app, which analyses it
+    /// with its own AI and files a structured task. Tendedero only ships the
+    /// raw text; the analysis is the todo app's job. Result is reported on the
+    /// card with the same "Copied"-style badge, green for sent, red on error.
+    func addToTodo(_ id: UUID) {
+        guard let item = items.first(where: { $0.id == id }), item.isText,
+              let text = try? String(contentsOf: item.url, encoding: .utf8),
+              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        TodoSender.send(text: text) { [weak self] ok, message in
+            guard let self else { return }
+            if ok {
+                self.copiedID = id
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    if self.copiedID == id { self.copiedID = nil }
+                }
+                self.play("Tink", volume: 0.35)
+            } else {
+                log.error("Add to todo failed: \(message, privacy: .public)")
+                NSSound.beep()
+            }
+        }
+    }
+
     /// Long press: open the photo in the system Markup editor. Markup does
     /// not edit video, so a recording opens in the trimming editor instead.
     func markup(_ id: UUID) {
