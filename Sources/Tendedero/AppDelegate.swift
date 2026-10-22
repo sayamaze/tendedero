@@ -519,6 +519,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                         panel.placeOnScreen()
                         updateCapacity()
                     }
+                    // An empty line has wanted off, so refresh() would dismiss
+                    // and reveal() would no-op. Want the line, then bring it down.
+                    wanted = true
                     refresh()
                     reveal()
                 }
